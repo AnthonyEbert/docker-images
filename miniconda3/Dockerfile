@@ -1,4 +1,4 @@
-FROM debian:8
+FROM debian:9
 
 MAINTAINER Kamil Kwiek <kamil.kwiek@continuum.io>
 
@@ -13,12 +13,16 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
     /bin/bash ~/miniconda.sh -b -p /opt/conda && \
     rm ~/miniconda.sh
 
-RUN apt-get install -y curl grep sed dpkg && \
+RUN apt-get install -y curl grep sed dpkg lsb-release && \
     TINI_VERSION=`curl https://github.com/krallin/tini/releases/latest | grep -o "/v.*\"" | sed 's:^..\(.*\).$:\1:'` && \
     curl -L "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini_${TINI_VERSION}.deb" > tini.deb && \
     dpkg -i tini.deb && \
     rm tini.deb && \
     apt-get clean
+
+RUN sudo adduser user --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
+
+RUN echo "user:user" | sudo chpasswd
 
 ENV PATH /opt/conda/bin:$PATH
 
